@@ -1,4 +1,5 @@
-# Instrucciones para configurar el entorno, este entorno debe ser personal, se debe de crear en una carpeta externa a la del proyecto.
+# Instrucciones para configurar el entorno.
+ Este entorno debe ser personal, se debe de crear en una carpeta externa a la del proyecto.
 
 1. **Crear un entorno virtual**. Esto se puede hacer con los siguientes comandos:
    ```bash
