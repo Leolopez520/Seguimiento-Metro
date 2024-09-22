@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Ubicacion</string>
+    <string name="presione_el_bot_n_para_acceder_a_la_ubicaci_n_del_dispositivo">Presione el botón para acceder a la ubicación del dispositivo</string>
+    <string name="permitir">Permitir</string>
+</resources>
