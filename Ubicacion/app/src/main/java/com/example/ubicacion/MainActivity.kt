@@ -123,9 +123,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun enviarUbicacion(latitud: Double, longitud: Double) {
         Thread {
-            val url = URL("http://192.168.100.6:5000/ubicacion")
-            val urlConnection = url.openConnection() as HttpURLConnection
+            var urlConnection: HttpURLConnection? = null
             try {
+                val url = URL("http://20.163.180.10:5000/ubicacion")
+                urlConnection = url.openConnection() as HttpURLConnection
                 urlConnection.requestMethod = "POST"
                 urlConnection.setRequestProperty("Content-Type", "application/json")
                 urlConnection.doOutput = true
@@ -137,6 +138,8 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 val responseCode = urlConnection.responseCode
+                Log.i("Ubicacion", "Código de respuesta: $responseCode")
+
                 if (responseCode == HttpURLConnection.HTTP_OK) {
                     Log.i("Ubicacion", "Ubicación enviada exitosamente.")
                 } else {
@@ -145,8 +148,10 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e("Ubicacion", "Error: ${e.message}")
             } finally {
-                urlConnection.disconnect()
+                urlConnection?.disconnect()
             }
         }.start()
     }
+
+
 }
