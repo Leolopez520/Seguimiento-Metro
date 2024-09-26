@@ -23,8 +23,6 @@ import java.net.URL
 import android.view.WindowManager
 import android.content.Intent
 
-
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var texto: TextView
@@ -79,11 +77,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 1) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -104,7 +98,6 @@ class MainActivity : AppCompatActivity() {
         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
-
     private fun actualizaTexyView() {
         texto.text = "Obteniendo ubicación..."
 
@@ -117,8 +110,9 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, LocationService::class.java)
         startService(intent)
 
-        // Solicitar actualizaciones de ubicación
+        // Solicitar actualizaciones de ubicación de GPS y red
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0f, locationListener)
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0f, locationListener)
     }
 
     private fun enviarUbicacion(latitud: Double, longitud: Double) {
@@ -152,6 +146,4 @@ class MainActivity : AppCompatActivity() {
             }
         }.start()
     }
-
-
 }

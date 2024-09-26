@@ -10,10 +10,6 @@ import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import android.Manifest
 import android.content.pm.PackageManager
-
-
-
-
 import android.util.Log
 
 class LocationService : Service() {
@@ -29,6 +25,7 @@ class LocationService : Service() {
             override fun onLocationChanged(location: Location) {
                 val latitud = location.latitude
                 val longitud = location.longitude
+                Log.d("LocationService", "Ubicación obtenida: Latitud: $latitud, Longitud: $longitud")
                 enviarUbicacion(latitud, longitud)
             }
 
@@ -43,16 +40,17 @@ class LocationService : Service() {
 
     private fun startLocationUpdates() {
         // Verifica permisos antes de solicitar actualizaciones
-        // (Asegúrate de manejar los permisos en tu actividad principal)
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0f, locationListener)
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0f, locationListener)
     }
 
     private fun enviarUbicacion(latitud: Double, longitud: Double) {
         Thread {
-            // Aquí va tu lógica para enviar la ubicación al servidor
+            Log.i("LocationService", "Enviando ubicación: Latitud: $latitud, Longitud: $longitud")
+            // Aquí va la lógica para enviar la ubicación al servidor
         }.start()
     }
 
