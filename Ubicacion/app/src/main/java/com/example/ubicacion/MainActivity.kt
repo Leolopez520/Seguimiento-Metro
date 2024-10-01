@@ -125,6 +125,7 @@ class MainActivity : AppCompatActivity() {
                 urlConnection.setRequestProperty("Content-Type", "application/json")
                 urlConnection.doOutput = true
 
+                // Enviar la ubicación sin ID, ya que la IP se utilizará en el servidor
                 val jsonInputString = "{\"latitud\": $latitud, \"longitud\": $longitud}"
 
                 urlConnection.outputStream.use { outputStream ->
