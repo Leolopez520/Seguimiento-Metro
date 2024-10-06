@@ -11,15 +11,25 @@ import androidx.core.app.ActivityCompat
 import android.Manifest
 import android.content.pm.PackageManager
 import android.util.Log
+import android.provider.Settings
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class LocationService : Service() {
 
     private lateinit var locationManager: LocationManager
     private lateinit var locationListener: LocationListener
 
+    // Ahora obtenemos el ID del dispositivo basado en el ANDROID_ID
+    private lateinit var idConvoy: String
+
     override fun onCreate() {
         super.onCreate()
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+
+        // Obtener el ANDROID_ID del dispositivo
+        idConvoy = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 
         locationListener = object : LocationListener {
             override fun onLocationChanged(location: Location) {
@@ -50,7 +60,21 @@ class LocationService : Service() {
     private fun enviarUbicacion(latitud: Double, longitud: Double) {
         Thread {
             Log.i("LocationService", "Enviando ubicación: Latitud: $latitud, Longitud: $longitud")
-            // Aquí va la lógica para enviar la ubicación al servidor
+
+            // Generar el timestamp actual
+            val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.getDefault()).format(Date())
+
+            // Aquí iría la lógica para enviar la ubicación al servidor junto con el ID del convoy y el timestamp
+            val jsonInputString = """
+                {
+                    "id_convoy": "$idConvoy",
+                    "latitud": $latitud,
+                    "longitud": $longitud,
+                    "timestamp": "$timestamp"
+                }
+            """.trimIndent()
+
+            // Envío al servidor con la lógica adecuada (similar a MainActivity)
         }.start()
     }
 

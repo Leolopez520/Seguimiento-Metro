@@ -8,6 +8,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
@@ -22,6 +23,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 import android.view.WindowManager
 import android.content.Intent
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,10 +33,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var locationManager: LocationManager
     private lateinit var locationListener: LocationListener
 
+    // Ahora obtenemos el ID del dispositivo basado en el ANDROID_ID
+    private lateinit var idConvoy: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        // Obtener el ANDROID_ID del dispositivo
+        idConvoy = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -125,8 +135,18 @@ class MainActivity : AppCompatActivity() {
                 urlConnection.setRequestProperty("Content-Type", "application/json")
                 urlConnection.doOutput = true
 
-                // Enviar la ubicación sin ID, ya que la IP se utilizará en el servidor
-                val jsonInputString = "{\"latitud\": $latitud, \"longitud\": $longitud}"
+                // Generar el timestamp actual
+                val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.getDefault()).format(Date())
+
+                // Enviar la ubicación junto con el ID del convoy y el timestamp
+                val jsonInputString = """
+                    {
+                        "id_convoy": "$idConvoy",
+                        "latitud": $latitud,
+                        "longitud": $longitud,
+                        "timestamp": "$timestamp"
+                    }
+                """.trimIndent()
 
                 urlConnection.outputStream.use { outputStream ->
                     outputStream.write(jsonInputString.toByteArray())
