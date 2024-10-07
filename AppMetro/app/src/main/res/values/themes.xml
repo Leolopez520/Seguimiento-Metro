@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme -->
+    <style name="Theme.AppMetro" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorAccent">@color/teal_200</item> <!-- Reemplazo de colorSecondary -->
+        <item name="android:textColorPrimary">@android:color/black</item>
+    </style>
+</resources>
+
