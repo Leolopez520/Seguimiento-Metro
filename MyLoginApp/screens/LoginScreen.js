@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import LoginForm from '../components/LoginForm';
 
 const LoginScreen = () => {
+  const navigation = useNavigation();
+
   const handleLogin = (email, password) => {
-    // Lógica de autenticación
     console.log('Login:', email, password);
-    // Temporarily, you can keep the console log and remove navigation
   };
 
   return (
@@ -14,7 +15,12 @@ const LoginScreen = () => {
       <Text style={styles.title}>Iniciar Sesión</Text>
       <LoginForm onLogin={handleLogin} />
       <View style={styles.linksContainer}>
-        <Text>Los enlaces adicionales no están disponibles.</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+          <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+          <Text style={styles.link}>Registrarse</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -34,6 +40,11 @@ const styles = StyleSheet.create({
   },
   linksContainer: {
     marginTop: 20,
+  },
+  link: {
+    color: 'blue',
+    textAlign: 'center',
+    marginBottom: 10,
   },
 });
 
