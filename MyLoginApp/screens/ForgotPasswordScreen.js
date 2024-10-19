@@ -1,11 +1,27 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import axios from 'axios';
 
 const ForgotPasswordScreen = () => {
   const [email, setEmail] = useState('');
 
-  const handleResetPassword = () => {
-    console.log('Reset password for:', email);
+  const handleResetPassword = async () => {
+    try {
+      // Enviar solicitud al servidor para restablecer la contraseña
+      const response = await axios.post('http://20.163.180.10:5000/recuperar', {
+        correo: email,
+      });
+
+      // Manejar la respuesta del servidor
+      if (response.data.status === 'success') {
+        Alert.alert('Éxito', 'Correo de recuperación enviado a tu email');
+      } else {
+        Alert.alert('Error', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error al conectar con la API:', error);
+      Alert.alert('Error de conexión', 'No se pudo conectar con el servidor');
+    }
   };
 
   return (

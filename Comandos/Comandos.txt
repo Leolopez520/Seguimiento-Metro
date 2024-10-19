@@ -4,3 +4,7 @@ gunicorn --bind 0.0.0.0:5000 wsgi:app
 User: metroL4
 Password: metroteam_l4
 ip pública: 20.163.180.10
+
+
+Pass aplicación gmail
+lfug ekah sbxt yamf

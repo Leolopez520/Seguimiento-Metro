@@ -1,67 +1,110 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
+import { View, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
 const SignupScreen = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const navigation = useNavigation();
+  const [correo, setCorreo] = useState('');
+  const [nombre, setNombre] = useState('');
+  const [primerApellido, setPrimerApellido] = useState('');
+  const [segundoApellido, setSegundoApellido] = useState('');
+  const [contraseña, setContraseña] = useState('');
 
-  const handleSignup = () => {
-    if (password !== confirmPassword) {
-      console.log('Las contraseñas no coinciden');
+  // Función para validar el formato de la contraseña
+  const validarContraseña = (contraseña) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    return regex.test(contraseña);
+  };
+
+  const handleSignup = async () => {
+    // Validar el formato de la contraseña
+    if (!validarContraseña(contraseña)) {
+      Alert.alert(
+        'Formato de contraseña inválido',
+        'La contraseña debe tener al menos 8 caracteres, incluir una mayúscula, una minúscula, un número y un caracter especial.'
+      );
       return;
     }
-    console.log('Registrando usuario con email:', email);
-    // Aquí iría la lógica de registro
+
+    try {
+      const response = await axios.post('http://20.163.180.10:5000/registro', {
+        correo: correo,
+        nombre: nombre,
+        primer_apellido: primerApellido,
+        segundo_apellido: segundoApellido,
+        contraseña: contraseña,
+        tipo_usuario: false
+      });
+
+      if (response.data.status === 'success') {
+        Alert.alert(
+          'Registro exitoso',
+          'Usuario registrado correctamente',
+          [
+            { text: 'OK', onPress: () => navigation.navigate('Login') }
+          ]
+        );
+      } 
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        Alert.alert('Error', 'El correo ya está registrado, intenta con otro.');
+      } else {
+        console.error('Error al conectar con la API:', error);
+        Alert.alert('Error de conexión', 'No se pudo conectar con el servidor');
+      }
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Registrarse</Text>
       <TextInput
         style={styles.input}
         placeholder="Correo electrónico"
-        value={email}
-        onChangeText={setEmail}
+        value={correo}
+        onChangeText={setCorreo}
         keyboardType="email-address"
         autoCapitalize="none"
       />
       <TextInput
         style={styles.input}
-        placeholder="Contraseña"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
+        placeholder="Nombre"
+        value={nombre}
+        onChangeText={setNombre}
       />
       <TextInput
         style={styles.input}
-        placeholder="Confirmar Contraseña"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
+        placeholder="Primer apellido"
+        value={primerApellido}
+        onChangeText={setPrimerApellido}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Segundo apellido"
+        value={segundoApellido}
+        onChangeText={setSegundoApellido}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Contraseña"
+        value={contraseña}
+        onChangeText={setContraseña}
         secureTextEntry
       />
-      <Button title="Registrar" onPress={handleSignup} />
+      <Button title="Registrarse" onPress={handleSignup} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
     padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
   },
   input: {
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 20,
+    marginBottom: 10,
     paddingHorizontal: 10,
   },
 });
