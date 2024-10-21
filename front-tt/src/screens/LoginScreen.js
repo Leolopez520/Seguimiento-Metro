@@ -1,25 +1,18 @@
 // src/screens/LoginScreen.js
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 import '../styles/LoginScreen.css';  // Asegúrate de que el path sea correcto
+import { Link } from 'react-router-dom';  // Importamos Link de react-router-dom
 
 const LoginScreen = () => {
-  const navigate = useNavigate();
-
-  const handleLogin = (email, password) => {
-    // Lógica de autenticación
-    console.log('Login:', email, password);
-    navigate('/home');
-  };
-
   return (
     <div className="login-container">
       <h2 className="login-title">Iniciar Sesión</h2>
-      <LoginForm onLogin={handleLogin} />
+      <LoginForm />
       <div className="links-container">
-        <a href="/forgot-password" className="link">¿Olvidaste tu contraseña?</a>
-        <a href="/signup" className="link">Registrarse</a>
+        <a href="/forgot-password" className="link">¿Olvidaste tu contraseña?OLDDDDDD</a>
+        <Link to="/forgotpassword" className="forgotpassword-link">¿Olvidaste tu contraseña?</Link>
+        <Link to="/signup" className="login-link">Registrarse</Link>
         <a href="/home" className="link">Ver Mapa</a>
         <a href="/admin-map" className="link">Ver Mapa Superusuario</a>
       </div>
