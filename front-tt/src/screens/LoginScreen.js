@@ -10,7 +10,6 @@ const LoginScreen = () => {
       <h2 className="login-title">Iniciar Sesión</h2>
       <LoginForm />
       <div className="links-container">
-        <a href="/forgot-password" className="link">¿Olvidaste tu contraseña?OLDDDDDD</a>
         <Link to="/forgotpassword" className="forgotpassword-link">¿Olvidaste tu contraseña?</Link>
         <Link to="/signup" className="login-link">Registrarse</Link>
         <a href="/home" className="link">Ver Mapa</a>
