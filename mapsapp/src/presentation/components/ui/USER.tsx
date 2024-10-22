@@ -1,0 +1,51 @@
+import Icon from 'react-native-vector-icons/Ionicons';
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native'
+
+
+
+interface Props {
+    iconName: string;
+    onPress: () => void;
+
+    style?: StyleProp<ViewStyle>;
+}
+
+export const USER = ({iconName, onPress, style }:Props) => {
+    return (
+      <View style = {[ styles.btn, style ]}>
+        <Pressable 
+        onPress={ onPress }
+        >
+            <Icon 
+            name={ iconName }
+            size={ 40 }
+            color= 'white'
+            />
+
+
+        </Pressable>
+      </View>
+    )
+  }
+
+
+
+  const styles = StyleSheet.create({
+    btn: {
+        zIndex: 1,
+        position: 'absolute',
+        height: 60,
+        width: 60,
+        borderRadius: 70,
+        backgroundColor: 'black',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowOpacity: 0.3,
+        shadowOffset: { 
+            height: 0.27,
+            width: 4.5
+        },
+        elevation: 5,
+
+    }
+  })
