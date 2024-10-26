@@ -1,7 +1,7 @@
-// ManageConvoys.js
+// /screens/ManageConvoys.js
 import React, { useState } from 'react';
 import ConvoyTable from '../components/ConvoyTable';
-import '../styles/GlobalStyles.css';
+import '../styles/ManageConvoy.css';
 
 const ManageConvoys = () => {
   const [convoys, setConvoys] = useState([

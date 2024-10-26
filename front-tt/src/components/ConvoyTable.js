@@ -1,4 +1,4 @@
-// ConvoyTable.js
+// /components/ConvoyTable.js
 import React from 'react';
 
 const ConvoyTable = ({ convoys, handleEdit, handleDelete, handleStatusChange }) => {
