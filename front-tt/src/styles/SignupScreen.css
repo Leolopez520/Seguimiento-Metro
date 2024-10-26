@@ -8,31 +8,42 @@ body {
   .signup-container {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     height: 100vh;
+    padding-top: 50px;
   }
-  
+
   .signup-title {
     font-weight: bold;
     font-size: 24px;
     margin-bottom: 20px;
+    text-align: center;
   }
   
   .signup-form {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
+    max-width: 400px; /* Limitar el ancho máximo */
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    background-color: white; /* Fondo blanco para la "tarjeta" del formulario */
   }
   
+ 
   .signup-input {
-    width: 300px;
+    width: 100%;
     padding: 10px;
     margin: 10px 0;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #e1e0e1;
     color: black;
+  
   }
   
   .signup-button {
@@ -40,10 +51,42 @@ body {
     color: white;
     padding: 10px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
+    width: 100%; /* Ancho completo del botón */
   }
   
   .signup-button:hover {
     background-color: darkblue;
   }
+
+  /* Estilos Responsivos */
+@media (max-width: 768px) {
+  .signup-title {
+      font-size: 20px; /* Reducir tamaño de fuente en pantallas medianas */
+  }
+
+  .signup-input {
+      padding: 8px; /* Ajustar padding en inputs */
+      font-size: 14px; /* Reducir tamaño de texto */
+  }
+
+  .signup-button {
+      padding: 8px 16px; /* Ajustar padding en botones */
+  }
+}
+
+/* Responsividad */
+@media (max-width: 500px) {
+  .signup-title {
+    font-size: 20px; /* Ajuste de tamaño de título para pantallas pequeñas */
+  }
+
+  .signup-input {
+    height: 35px; /* Ajuste de altura del input */
+  }
+
+  .signup-button {
+    padding: 8px 15px; /* Ajuste del padding del botón */
+  }
+}

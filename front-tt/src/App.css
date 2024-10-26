@@ -24,17 +24,6 @@ form {
   align-items: center;
 }
 
-input[type="email"],
-input[type="password"] {
-  width: 300px;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #e1e0e1; /* Color de fondo de los campos de texto */
-  color: black; /* Color del texto en negro */
-}
-
 .password-toggle {
   display: flex;
   align-items: center;
