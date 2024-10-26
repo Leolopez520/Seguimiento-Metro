@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 
 const ConvoyForm = ({ selectedConvoy, handleSubmit, handleCancel }) => {
   const [convoyData, setConvoyData] = useState({
-    numero: '',
     modelo: '',
     status: true,
     idGPS: ''
@@ -12,6 +11,8 @@ const ConvoyForm = ({ selectedConvoy, handleSubmit, handleCancel }) => {
   useEffect(() => {
     if (selectedConvoy) {
       setConvoyData(selectedConvoy);
+    }else {
+      setConvoyData({ modelo: '', status: true, idGPS: '' });
     }
   }, [selectedConvoy]);
 
@@ -29,28 +30,23 @@ const ConvoyForm = ({ selectedConvoy, handleSubmit, handleCancel }) => {
   };
 
   return (
-    <form onSubmit={handleFormSubmit}>
-      <label>
-        N° Convoy:
-        <input type="text" name="numero" value={convoyData.numero} onChange={handleChange} />
-      </label>
-      <label>
-        Modelo:
-        <input type="text" name="modelo" value={convoyData.modelo} onChange={handleChange} />
-      </label>
-      <label>
-        ID GPS:
-        <input type="text" name="idGPS" value={convoyData.idGPS} onChange={handleChange} />
-      </label>
-      <label>
-        Status:
-        <input
-          type="checkbox"
-          name="status"
-          checked={convoyData.status}
-          onChange={() => setConvoyData({ ...convoyData, status: !convoyData.status })}
-        />
-      </label>
+    <form onSubmit={handleFormSubmit} className="add-convoy-form">
+      <input
+        type="text"
+        name="modelo"
+        placeholder="Modelo"
+        value={convoyData.modelo}
+        onChange={handleChange}
+        required
+      />
+      <input
+        type="text"
+        name="idGPS"
+        placeholder="ID GPS"
+        value={convoyData.idGPS}
+        onChange={handleChange}
+        required
+      />
       <button type="submit">Guardar Convoy</button>
       <button type="button" onClick={handleCancel}>Cancelar</button>
     </form>

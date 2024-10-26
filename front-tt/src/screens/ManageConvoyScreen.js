@@ -1,60 +1,83 @@
 // /screens/ManageConvoys.js
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import ConvoyTable from '../components/ConvoyTable';
+import ConvoyForm from '../components/ConvoyForm';
+import axios from 'axios';
 import '../styles/ManageConvoy.css';
 
 const ManageConvoys = () => {
-  const [convoys, setConvoys] = useState([
-    { id: 1, modelo: 'Modelo A', status: true, idGPS: 'GPS123' },
-    { id: 2, modelo: 'Modelo B', status: false, idGPS: 'GPS456' },
-    { id: 3, modelo: 'Modelo C', status: true, idGPS: 'GPS789' },
-  ]);
+  const [convoys, setConvoys] = useState([]);
+  const [selectedConvoy, setSelectedConvoy] = useState(null);
+  const [error, setError] = useState('');
 
-  const [newConvoy, setNewConvoy] = useState({ id: '', modelo: '', status: true, idGPS: '' });
+  useEffect(() => {
+    // Aquí puedes cargar los convoyes desde tu API al montar el componente
+    const fetchConvoys = async () => {
+      try {
+        const response = await axios.get('http://20.163.180.10:5000/convoys');
+        setConvoys(response.data);
+      } catch (error) {
+        console.error('Error al cargar los convoyes:', error);
+      }
+    };
 
-  // Prototipo de la función para hacer el POST y agregar un convoy
-  const handleAddConvoy = () => {
-    // Continuar con el post 
-    // Simulación de un nuevo convoy
-    const newId = convoys.length + 1;
-    const updatedConvoys = [...convoys, { ...newConvoy, id: newId }];
-    setConvoys(updatedConvoys);
+    fetchConvoys();
+  }, []);
+  
+  const handleAddConvoy = async (convoy) => {
+    if (!convoy.modelo || !convoy.idGPS) {
+      setError('Por favor, completa todos los campos.');
+      return;
+    }
 
-    // Resetear el formulario
-    setNewConvoy({ id: '', modelo: '', status: true, idGPS: '' });
+    try {
+      const response = await axios.post('http://20.163.180.10:5000/convoys', convoy);
+      setConvoys([...convoys, response.data]);
+      setSelectedConvoy(null); // Reseteamos el formulario
+      setError('');
+    } catch (error) {
+      console.error('Error al agregar convoy:', error);
+    }
+  };
+
+  const handleEdit = (convoy) => {
+    setSelectedConvoy(convoy);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://20.163.180.10:5000/convoys/${id}`);
+      setConvoys(convoys.filter(convoy => convoy.id !== id));
+    } catch (error) {
+      console.error('Error al eliminar convoy:', error);
+    }
+  };
+
+  const handleStatusChange = async (id) => {
+    const convoyToUpdate = convoys.find(convoy => convoy.id === id);
+    const updatedStatus = !convoyToUpdate.status;
+
+    try {
+      await axios.put(`http://20.163.180.10:5000/convoys/${id}`, { status: updatedStatus });
+      setConvoys(convoys.map(convoy => (convoy.id === id ? { ...convoy, status: updatedStatus } : convoy)));
+    } catch (error) {
+      console.error('Error al actualizar el estado del convoy:', error);
+    }
   };
 
   return (
     <div className="manage-convoys-container">
       <h1>Gestionar Convoy</h1>
 
+      {error && <p className="error-message">{error}</p>}
       {/* Tabla de Convoys */}
       <ConvoyTable
         convoys={convoys}
-        handleEdit={(id) => console.log('Edit convoy', id)}
-        handleDelete={(id) => console.log('Delete convoy', id)}
-        handleStatusChange={(id) => console.log('Status changed for convoy', id)}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+        handleStatusChange={handleStatusChange}
       />
-
-      {/* Formulario para agregar convoy */}
-      <div className="add-convoy-form">
-        <input
-          type="text"
-          placeholder="Modelo"
-          value={newConvoy.modelo}
-          onChange={(e) => setNewConvoy({ ...newConvoy, modelo: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="ID GPS"
-          value={newConvoy.idGPS}
-          onChange={(e) => setNewConvoy({ ...newConvoy, idGPS: e.target.value })}
-        />
-        <button onClick={handleAddConvoy}>Guardar Convoy</button>
-      </div>
-
-      {/* Botón de "Nuevo Convoy" */}
-      <button className="nuevo-convoy-button">Nuevo Convoy</button>
+      <ConvoyForm selectedConvoy={selectedConvoy} handleSubmit={handleAddConvoy} handleCancel={() => setSelectedConvoy(null)} />
     </div>
   );
 };

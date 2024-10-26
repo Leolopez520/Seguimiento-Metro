@@ -1,5 +1,6 @@
 // /components/ConvoyTable.js
 import React from 'react';
+import ConvoyRow from './ConvoyRow';
 
 const ConvoyTable = ({ convoys, handleEdit, handleDelete, handleStatusChange }) => {
   return (
@@ -15,21 +16,13 @@ const ConvoyTable = ({ convoys, handleEdit, handleDelete, handleStatusChange }) 
       </thead>
       <tbody>
         {convoys.map((convoy) => (
-          <tr key={convoy.id}>
-            <td>{convoy.id}</td>
-            <td>{convoy.modelo}</td>
-            <td>
-              <div
-                className={`status-circle ${convoy.status ? 'status-active' : 'status-inactive'}`}
-                onClick={() => handleStatusChange(convoy.id)}
-              ></div>
-            </td>
-            <td>{convoy.idGPS}</td>
-            <td>
-              <button onClick={() => handleEdit(convoy.id)}>✏️</button>
-              <button onClick={() => handleDelete(convoy.id)}>🗑️</button>
-            </td>
-          </tr>
+          <ConvoyRow
+          key={convoy.id}
+          convoy={convoy}
+          handleEdit={handleEdit}
+          handleDelete={handleDelete}
+          handleStatusChange={handleStatusChange}
+        />
         ))}
       </tbody>
     </table>

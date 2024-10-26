@@ -4,11 +4,11 @@ import React from 'react';
 const ConvoyRow = ({ convoy, handleEdit, handleDelete, handleStatusChange }) => {
   return (
     <tr>
-      <td>{convoy.numero}</td>
+      <td>{convoy.id}</td>
       <td>{convoy.modelo}</td>
       <td>
         <span
-          className={`status-circle ${convoy.status ? 'active' : 'inactive'}`}
+          className={`status-circle ${convoy.status ? 'status-active' : 'status-inactive'}`}
           onClick={() => handleStatusChange(convoy.id)}
         />
       </td>

@@ -5,6 +5,8 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
+    max-width: 800px; /* Limitar el ancho máximo */
+    margin: auto; /* Centramos el contenedor */
   }
   
   h1 {
@@ -41,10 +43,10 @@
     background-color: red;
   }
   
-  /* Formulario para agregar un convoy */
   .add-convoy-form {
     display: flex;
     flex-direction: column;
+    width: 100%;
     margin-bottom: 20px;
   }
   
@@ -60,14 +62,64 @@
     color: white;
     border: none;
     cursor: pointer;
+    width: 100%;
+    width: auto; /* Cambia a auto para que se ajuste al contenido */
+    margin-right: 5px; /* Agrega un margen entre los botones */
   }
   
-  /* Botón para "Nuevo Convoy" */
-  .nuevo-convoy-button {
-    padding: 10px 20px;
-    background-color: blue;
-    color: white;
-    border: none;
-    cursor: pointer;
+  .add-convoy-form .button-container {
+    display: flex; /* Contenedor para los botones */
+    justify-content: flex-start; /* Alineación hacia la izquierda */
+    margin-top: 10px; /* Espacio arriba de los botones */
+}
+
+.add-convoy-form button:hover {
+  background-color: darkblue; /* Cambiar color al pasar el mouse */
+}
+
+.edit-btn,
+.delete-btn {
+  margin-left: 5px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.edit-btn:hover,
+.delete-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Estilos Responsivos */
+@media (max-width: 768px) {
+  h1 {
+      font-size: 20px; /* Reducir tamaño de fuente en pantallas más pequeñas */
   }
-  
+
+  .convoy-table th,
+  .convoy-table td {
+      font-size: 14px; /* Ajustar el tamaño de texto en la tabla */
+  }
+
+  .add-convoy-form input,
+  .add-convoy-form button {
+      padding: 6px; /* Ajustar padding en inputs y botones */
+  }
+}
+
+@media (max-width: 480px) {
+  .manage-convoys-container {
+      padding: 10px; /* Reducir padding en pantallas muy pequeñas */
+  }
+
+  h1 {
+      font-size: 18px; /* Ajustar aún más el tamaño de la fuente */
+  }
+
+  .add-convoy-form input,
+  .add-convoy-form button {
+      font-size: 12px; /* Hacer más pequeños los inputs y botones */
+  }
+}
