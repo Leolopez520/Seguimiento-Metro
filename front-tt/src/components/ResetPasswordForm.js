@@ -19,7 +19,7 @@ const ResetPasswordForm = ({ token, onSuccess }) => {
     }
 
     try {
-      const response = await axios.post(`/resetear/${token}`, { contraseña: password });
+      const response = await axios.post(`http://20.163.180.10:5000/resetear/${token}`, { contraseña: password });
       setSuccess(response.data.message);
       onSuccess(); // Llama a la función para manejar el éxito
     } catch (err) {
