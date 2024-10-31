@@ -61,6 +61,15 @@ const LoginForm = () => {
         <label>Mostrar Contraseña</label>
       </div>
       <button type="submit" className="login-button">Iniciar sesión</button>
+
+      <button
+        type="button"
+        className="download-app-button"
+        onClick={() => navigate('/downloadapp')}
+      >
+        Descargar App
+      </button>
+
     </form>
   );
 };

@@ -82,6 +82,35 @@ body {
   .link:hover {
     text-decoration: underline; /* Añadir subrayado al pasar el ratón */
   }
+  
+  /* Botón de descarga en la esquina inferior derecha */
+.download-app-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: #3cba54; /* Verde más oscuro que el logo de Android */
+  color: white;
+  padding: 15px 25px; /* Botón más grande */
+  font-size: 16px; /* Texto más grande */
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.download-app-button:hover {
+  background-color: #349e46; /* Verde más oscuro al pasar el ratón */
+}
+
+/* Responsividad */
+@media (max-width: 500px) {
+  .download-app-button {
+    padding: 12px 20px; /* Reducir padding en pantallas pequeñas */
+    font-size: 14px; /* Reducir tamaño de texto */
+    bottom: 10px;
+    right: 10px;
+  }
+}
 
   /* Responsividad */
 @media (max-width: 500px) {
