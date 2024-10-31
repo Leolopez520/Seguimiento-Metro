@@ -10,58 +10,65 @@ const ManageConvoys = () => {
   const [selectedConvoy, setSelectedConvoy] = useState(null);
   const [error, setError] = useState('');
 
+  // Cargar los convoyes desde la API al montar el componente
   useEffect(() => {
-    // Aquí puedes cargar los convoyes desde tu API al montar el componente
     const fetchConvoys = async () => {
       try {
         const response = await axios.get('http://20.163.180.10:5000/convoys');
-        setConvoys(response.data);
+        setConvoys(response.data.convoys); // Acceder a la propiedad `convoys` de la respuesta
       } catch (error) {
         console.error('Error al cargar los convoyes:', error);
+        setError('Error al cargar los convoyes');
       }
     };
 
     fetchConvoys();
   }, []);
   
+  // Función para agregar un convoy
   const handleAddConvoy = async (convoy) => {
-    if (!convoy.modelo || !convoy.idGPS) {
+    if (!convoy.id_convoy || !convoy.modelo || !convoy.numero_linea || !convoy.numero_convoy) {
       setError('Por favor, completa todos los campos.');
       return;
     }
 
     try {
-      const response = await axios.post('http://20.163.180.10:5000/convoys', convoy);
-      setConvoys([...convoys, response.data]);
+      await axios.post('http://20.163.180.10:5000/convoy', convoy);      setConvoys([...convoys, convoy]);
       setSelectedConvoy(null); // Reseteamos el formulario
       setError('');
     } catch (error) {
       console.error('Error al agregar convoy:', error);
+      setError('Error al agregar el convoy');
     }
   };
 
+  // Función para seleccionar un convoy y editarlo
   const handleEdit = (convoy) => {
     setSelectedConvoy(convoy);
   };
 
-  const handleDelete = async (id) => {
+  // Función para eliminar un convoy
+  const handleDelete = async (id_convoy) => {
     try {
-      await axios.delete(`http://20.163.180.10:5000/convoys/${id}`);
-      setConvoys(convoys.filter(convoy => convoy.id !== id));
+      await axios.delete(`http://20.163.180.10:5000/convoys/${id_convoy}`);
+      setConvoys(convoys.filter(convoy => convoy.id_convoy !== id_convoy)); // Eliminamos el convoy del estado
     } catch (error) {
       console.error('Error al eliminar convoy:', error);
+      setError('Error al eliminar el convoy');
     }
   };
 
-  const handleStatusChange = async (id) => {
-    const convoyToUpdate = convoys.find(convoy => convoy.id === id);
+  // Función para cambiar el estado del convoy (activo/inactivo)
+  const handleStatusChange = async (id_convoy) => {
+    const convoyToUpdate = convoys.find(convoy => convoy.id_convoy === id_convoy);
     const updatedStatus = !convoyToUpdate.status;
 
     try {
-      await axios.put(`http://20.163.180.10:5000/convoys/${id}`, { status: updatedStatus });
-      setConvoys(convoys.map(convoy => (convoy.id === id ? { ...convoy, status: updatedStatus } : convoy)));
+      await axios.put(`http://20.163.180.10:5000/convoys/${id_convoy}`, { status: updatedStatus });
+      setConvoys(convoys.map(convoy => (convoy.id_convoy === id_convoy ? { ...convoy, status: updatedStatus } : convoy)));
     } catch (error) {
       console.error('Error al actualizar el estado del convoy:', error);
+      setError('Error al actualizar el estado del convoy');
     }
   };
 
@@ -77,7 +84,9 @@ const ManageConvoys = () => {
         handleDelete={handleDelete}
         handleStatusChange={handleStatusChange}
       />
-      <ConvoyForm selectedConvoy={selectedConvoy} handleSubmit={handleAddConvoy} handleCancel={() => setSelectedConvoy(null)} />
+      <ConvoyForm selectedConvoy={selectedConvoy} 
+      handleSubmit={handleAddConvoy} 
+      handleCancel={() => setSelectedConvoy(null)} />
     </div>
   );
 };

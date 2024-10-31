@@ -174,6 +174,96 @@ def resetear_contraseña(token):
     except Exception as e:
         print(f"Error al resetear contraseña: {e}")
         return jsonify({'status': 'error', 'message': 'Token inválido o expirado'}), 400
+    
+# Crear un convoy
+@app.route('/convoy', methods=['POST'])
+def crear_convoy():
+    data = request.get_json()
+    numero_linea = data.get('numero_linea')
+    numero_convoy = data.get('numero_convoy')
+    modelo = data.get('modelo')
+    estatus = data.get('estatus', True)  # Por defecto activo
+
+    try:
+        cursor.execute("""
+            INSERT INTO convoy (numero_linea, numero_convoy, modelo, estatus)
+            VALUES (%s, %s, %s, %s)
+        """, (numero_linea, numero_convoy, modelo, estatus))
+
+        conn.commit()
+        return jsonify({'status': 'success', 'message': 'Convoy creado exitosamente'}), 201
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
+# Obtener un convoy por ID
+@app.route('/convoy/<int:id_convoy>', methods=['GET'])
+def obtener_convoy(id_convoy):
+    cursor.execute("SELECT * FROM convoy WHERE id_convoy = %s", (id_convoy,))
+    convoy = cursor.fetchone()
+
+    if convoy:
+        return jsonify({
+            'id_convoy': convoy[0],
+            'numero_linea': convoy[1],
+            'numero_convoy': convoy[2],
+            'modelo': convoy[3],
+            'estatus': convoy[4]
+        }), 200
+
+    return jsonify({'status': 'error', 'message': 'Convoy no encontrado'}), 404
+
+
+# Eliminar un convoy por ID
+@app.route('/convoy/<int:id_convoy>', methods=['DELETE'])
+def eliminar_convoy(id_convoy):
+    cursor.execute("DELETE FROM convoy WHERE id_convoy = %s", (id_convoy,))
+    conn.commit()
+
+    return jsonify({'status': 'success', 'message': 'Convoy eliminado exitosamente'}), 200
+
+
+# Modificar estatus o datos de convoy
+@app.route('/convoy/<int:id_convoy>', methods=['PUT'])
+def modificar_convoy(id_convoy):
+    data = request.get_json()
+    estatus = data.get('estatus')
+    numero_linea = data.get('numero_linea')
+    numero_convoy = data.get('numero_convoy')
+    modelo = data.get('modelo')
+
+    cursor.execute("""
+        UPDATE convoy SET estatus = COALESCE(%s, estatus), 
+                          numero_linea = COALESCE(%s, numero_linea),
+                          numero_convoy = COALESCE(%s, numero_convoy),
+                          modelo = COALESCE(%s, modelo)
+        WHERE id_convoy = %s
+    """, (estatus, numero_linea, numero_convoy, modelo, id_convoy))
+    
+    conn.commit()
+    return jsonify({'status': 'success', 'message': 'Convoy actualizado correctamente'}), 200
+
+
+# Listar todos los convoys
+@app.route('/convoys', methods=['GET'])
+def listar_convoys():
+    cursor.execute("SELECT * FROM convoy")
+    convoys = cursor.fetchall()
+
+    lista_convoys = [
+        {
+            'id_convoy': convoy[0],
+            'estatus': convoy[1],
+            'numero_linea': convoy[2],
+            'numero_convoy': convoy[3],
+            'modelo': convoy[4]
+        }
+        for convoy in convoys
+    ]
+
+    return jsonify({'status': 'success', 'convoys': lista_convoys}), 200
 
 
 @app.route('/ubicacion', methods=['POST'])

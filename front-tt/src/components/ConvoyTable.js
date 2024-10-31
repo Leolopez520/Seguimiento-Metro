@@ -10,14 +10,14 @@ const ConvoyTable = ({ convoys, handleEdit, handleDelete, handleStatusChange }) 
           <th>N° Convoy</th>
           <th>Modelo</th>
           <th>Status</th>
-          <th>ID GPS</th>
+          <th>ID convoy</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         {convoys.map((convoy) => (
           <ConvoyRow
-          key={convoy.id}
+          key={convoy.convoy_id}
           convoy={convoy}
           handleEdit={handleEdit}
           handleDelete={handleDelete}

@@ -4,15 +4,15 @@ import React, { useState, useEffect } from 'react';
 const ConvoyForm = ({ selectedConvoy, handleSubmit, handleCancel }) => {
   const [convoyData, setConvoyData] = useState({
     modelo: '',
-    status: true,
-    idGPS: ''
+    status: false,
+    id_convoy: ''
   });
 
   useEffect(() => {
     if (selectedConvoy) {
       setConvoyData(selectedConvoy);
     }else {
-      setConvoyData({ modelo: '', status: true, idGPS: '' });
+      setConvoyData({ id_convoy: '',  modelo: '', status: false,  });
     }
   }, [selectedConvoy]);
 
@@ -33,17 +33,17 @@ const ConvoyForm = ({ selectedConvoy, handleSubmit, handleCancel }) => {
     <form onSubmit={handleFormSubmit} className="add-convoy-form">
       <input
         type="text"
-        name="modelo"
-        placeholder="Modelo"
-        value={convoyData.modelo}
+        name="id_convoy"
+        placeholder="ID Convoy"
+        value={convoyData.id_convoy}
         onChange={handleChange}
         required
       />
       <input
         type="text"
-        name="idGPS"
-        placeholder="ID GPS"
-        value={convoyData.idGPS}
+        name="modelo"
+        placeholder="Modelo"
+        value={convoyData.modelo}
         onChange={handleChange}
         required
       />
