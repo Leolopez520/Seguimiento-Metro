@@ -182,13 +182,14 @@ def crear_convoy():
     numero_linea = data.get('numero_linea')
     numero_convoy = data.get('numero_convoy')
     modelo = data.get('modelo')
-    estatus = data.get('estatus', True)  # Por defecto activo
+    estatus = data.get('estatus', False)  # Por defecto falso
+    id_convoy = data.get('id_convoy')
 
     try:
         cursor.execute("""
-            INSERT INTO convoy (numero_linea, numero_convoy, modelo, estatus)
-            VALUES (%s, %s, %s, %s)
-        """, (numero_linea, numero_convoy, modelo, estatus))
+            INSERT INTO convoy (id_convoy, numero_linea, numero_convoy, modelo, estatus)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (id_convoy, numero_linea, numero_convoy, modelo, estatus))
 
         conn.commit()
         return jsonify({'status': 'success', 'message': 'Convoy creado exitosamente'}), 201
@@ -199,7 +200,7 @@ def crear_convoy():
 
 
 # Obtener un convoy por ID
-@app.route('/convoy/<int:id_convoy>', methods=['GET'])
+@app.route('/convoy/<String:id_convoy>', methods=['GET'])
 def obtener_convoy(id_convoy):
     cursor.execute("SELECT * FROM convoy WHERE id_convoy = %s", (id_convoy,))
     convoy = cursor.fetchone()
@@ -217,7 +218,7 @@ def obtener_convoy(id_convoy):
 
 
 # Eliminar un convoy por ID
-@app.route('/convoy/<int:id_convoy>', methods=['DELETE'])
+@app.route('/convoy/<String:id_convoy>', methods=['DELETE'])
 def eliminar_convoy(id_convoy):
     cursor.execute("DELETE FROM convoy WHERE id_convoy = %s", (id_convoy,))
     conn.commit()
@@ -226,7 +227,7 @@ def eliminar_convoy(id_convoy):
 
 
 # Modificar estatus o datos de convoy
-@app.route('/convoy/<int:id_convoy>', methods=['PUT'])
+@app.route('/convoy/<String:id_convoy>', methods=['PUT'])
 def modificar_convoy(id_convoy):
     data = request.get_json()
     estatus = data.get('estatus')
@@ -247,7 +248,7 @@ def modificar_convoy(id_convoy):
 
 
 # Listar todos los convoys
-@app.route('/convoys', methods=['GET'])
+@app.route('/convoy', methods=['GET'])
 def listar_convoys():
     cursor.execute("SELECT * FROM convoy")
     convoys = cursor.fetchall()

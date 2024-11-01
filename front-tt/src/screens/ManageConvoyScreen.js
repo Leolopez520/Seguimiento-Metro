@@ -14,7 +14,7 @@ const ManageConvoys = () => {
   useEffect(() => {
     const fetchConvoys = async () => {
       try {
-        const response = await axios.get('http://20.163.180.10:5000/convoys');
+        const response = await axios.get('http://20.163.180.10:5000/convoy');
         setConvoys(response.data.convoys); // Acceder a la propiedad `convoys` de la respuesta
       } catch (error) {
         console.error('Error al cargar los convoyes:', error);
@@ -50,7 +50,7 @@ const ManageConvoys = () => {
   // Función para eliminar un convoy
   const handleDelete = async (id_convoy) => {
     try {
-      await axios.delete(`http://20.163.180.10:5000/convoys/${id_convoy}`);
+      await axios.delete(`http://20.163.180.10:5000/convoy/${id_convoy}`);
       setConvoys(convoys.filter(convoy => convoy.id_convoy !== id_convoy)); // Eliminamos el convoy del estado
     } catch (error) {
       console.error('Error al eliminar convoy:', error);
@@ -64,7 +64,7 @@ const ManageConvoys = () => {
     const updatedStatus = !convoyToUpdate.status;
 
     try {
-      await axios.put(`http://20.163.180.10:5000/convoys/${id_convoy}`, { status: updatedStatus });
+      await axios.put(`http://20.163.180.10:5000/convoy/${id_convoy}`, { status: updatedStatus });
       setConvoys(convoys.map(convoy => (convoy.id_convoy === id_convoy ? { ...convoy, status: updatedStatus } : convoy)));
     } catch (error) {
       console.error('Error al actualizar el estado del convoy:', error);
