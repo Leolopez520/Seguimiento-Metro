@@ -7,7 +7,7 @@ import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import ManageConvoysScreen from './screens/ManageConvoyScreen';
 import ResetPassword from './screens/ResetPasswordScreen';
 import DownloadApp from './screens/DownloadApp'
-
+import MapScreen from "./screens/MapScreen";
 
 function App() {
   return (
@@ -19,6 +19,8 @@ function App() {
         <Route path="/manageconvoy" element= {<ManageConvoysScreen/>}/>
         <Route path="/resetear/:token" element={<ResetPassword />} />
         <Route path="/downloadapp" element={<DownloadApp/>}/>
+        <Route path="/home" element={<MapScreen />} />
+        <Route path="/login" element={<LoginScreen />} />
       </Routes>
     </Router>
   );
