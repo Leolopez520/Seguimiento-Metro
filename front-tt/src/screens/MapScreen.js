@@ -1,19 +1,50 @@
-import React from 'react';
+import React, {useState} from 'react';
 import MapComponent from '../components/MapComponent';
 import useMapNavigation from '../hooks/UseMapNavigation';
+import '../styles/MapStyle.css';
 
 const Home = () => {
-  const { onMapLoad, panToLocation, setMapZoom } = useMapNavigation();
+  const { onMapLoad, panToLocation, setMapZoom, locateUser } = useMapNavigation();
+  const [zoom, setZoom] = useState(10);
+  const [center, setCenter] = useState({ lat: 19.444048, lng: -99.11716 }); // Ubicación de centro línea 4
+
+  const handleZoomIn = () => {
+    const newZoom = zoom + 1;
+    setZoom(newZoom);
+    setMapZoom(newZoom);
+  };
+
+  const handleZoomOut = () => {
+    const newZoom = zoom - 1;
+    setZoom(newZoom);
+    setMapZoom(newZoom);
+  };
+
+
+  const handleLocateLine4 = () => {
+    const line4Coords = { lat: 19.444048, lng: -99.11716 };
+    setCenter(line4Coords);
+    panToLocation(line4Coords.lat, line4Coords.lng);
+  };
+
 
   return (
     <div>
-      <h1>Mapa Interactivo</h1>
+      <h1>Ubica Mi Metro</h1>
       <script src="//maps.google.com/maps?file=api&v=2&key=AIzaSyCYe-T8usnyG3BdsFqZV5ySYIhsSbWSMNs"></script>
-      <MapComponent center={{ lat: 19.432608, lng: -99.133209 }} zoom={10} onMapLoad={onMapLoad} />
-      <div style={{ marginTop: '10px' }}>
-        <button onClick={() => panToLocation(19.432608, -99.133209)}>CDMX</button>
-        <button onClick={() => setMapZoom(12)}>Zoom In</button>
-        <button onClick={() => setMapZoom(8)}>Zoom Out</button>
+      <MapComponent 
+        center={center} 
+        zoom={zoom} 
+        onMapLoad={onMapLoad} 
+        panToLocation={panToLocation}
+        setMapZoom={setMapZoom}
+        locateUser={locateUser}
+      />
+      <div className="controls-container">
+        <button className="map-button" onClick={handleZoomOut}>Zoom Out</button>
+        <button className="map-button" onClick={handleZoomIn}>Zoom In</button>
+        <button className="map-button" onClick={locateUser}>Ubicar Usuario</button>
+        <button className="map-button" onClick={handleLocateLine4}>Ubicar Línea 4</button>
       </div>
     </div>
   );
