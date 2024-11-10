@@ -5,7 +5,7 @@ import '../styles/MapStyle.css';
 
 const Home = () => {
   const { onMapLoad, panToLocation, setMapZoom, locateUser } = useMapNavigation();
-  const [zoom, setZoom] = useState(10);
+  const [zoom, setZoom] = useState(13);
   const [center, setCenter] = useState({ lat: 19.444048, lng: -99.11716 }); // Ubicación de centro línea 4
 
   const handleZoomIn = () => {
@@ -31,7 +31,6 @@ const Home = () => {
   return (
     <div>
       <h1>Ubica Mi Metro</h1>
-      <script src="//maps.google.com/maps?file=api&v=2&key=AIzaSyCYe-T8usnyG3BdsFqZV5ySYIhsSbWSMNs"></script>
       <MapComponent 
         center={center} 
         zoom={zoom} 
@@ -41,8 +40,8 @@ const Home = () => {
         locateUser={locateUser}
       />
       <div className="controls-container">
-        <button className="map-button" onClick={handleZoomOut}>Zoom Out</button>
         <button className="map-button" onClick={handleZoomIn}>Zoom In</button>
+        <button className="map-button" onClick={handleZoomOut}>Zoom Out</button>
         <button className="map-button" onClick={locateUser}>Ubicar Usuario</button>
         <button className="map-button" onClick={handleLocateLine4}>Ubicar Línea 4</button>
       </div>
