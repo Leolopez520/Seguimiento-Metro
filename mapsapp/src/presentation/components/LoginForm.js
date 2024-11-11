@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Alert, Text, TouchableOpacity } from 'react-native';
+import { View, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 const LoginForm = () => {
@@ -18,6 +19,10 @@ const LoginForm = () => {
       });
 
       if (response.data.status === 'success') {
+        // Guarda el ID del usuario en AsyncStorage
+        await AsyncStorage.setItem('userId', response.data.usuario.id_usuario.toString());
+        
+        // Navega a la pantalla de carga y luego al mapa
         navigation.navigate('LoadingScreen');
         setTimeout(() => {
           navigation.navigate('MapScreen');
@@ -39,7 +44,6 @@ const LoginForm = () => {
             },
           ],
         );
-
       } else {
         console.error('Error al conectar con la API:', error);
         Alert.alert('Error de conexión', 'No se pudo conectar con el servidor');
