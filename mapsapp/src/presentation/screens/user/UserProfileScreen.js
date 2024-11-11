@@ -101,7 +101,7 @@ const UserProfileScreen = ({ route }) => {
 
         <View style={styles.buttonContainer}>
           {!showPasswordFields && (
-            <Button title={editable ? "Guardar Cambios" : "Editar"} onPress={() => {
+            <Button title={editable ? "Guardar" : "Editar"} onPress={() => {
               if (editable) {
                 handleSaveChanges();
               } else {
