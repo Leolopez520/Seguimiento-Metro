@@ -2,7 +2,7 @@ import React from 'react';
 import { GoogleMap, LoadScript, Polyline, Marker, OverlayView} from '@react-google-maps/api';
 import '../styles/MapStyle.css';
 
-const MapComponent = ({center, zoom, onMapLoad, panToLocation, setMapZoom, locateUser, userLocation }) => {
+const MapComponent = ({center, zoom, onMapLoad, panToLocation, setMapZoom, locateUser, userLocation, showPolyline }) => {
   // Coordenadas de la línea 4 (ejemplo; reemplaza con coordenadas reales)
   const line4Coordinates = [
     {lat : 19.4022357503, lng : -99.1217200028},//empieza en Santa Anita
@@ -97,19 +97,19 @@ const MapComponent = ({center, zoom, onMapLoad, panToLocation, setMapZoom, locat
           }}
           >
           
-          <Marker position={center}/>
-
           {/* Agregar la polilínea */}
-          <Polyline
-            path={line4Coordinates}
-            options={{
-              strokeColor: '#62bbb1',
-              strokeOpacity: 1,
-              strokeWeight:8,
-              visible: true,
-              zIndex: 10,
-            }}
-          />
+          {showPolyline && (
+            <Polyline
+              path={line4Coordinates}
+              options={{
+                strokeColor: '#62bbb1',
+                strokeOpacity: 1,
+                strokeWeight:8,
+                visible: true,
+                zIndex: 10,
+              }}
+            />
+          )}
 
           {/* Punto azul circular para la ubicación del usuario */}
           {userLocation && (

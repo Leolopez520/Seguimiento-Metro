@@ -8,6 +8,7 @@ const Home = () => {
   const [zoom, setZoom] = useState(13);
   const [center, setCenter] = useState({ lat: 19.444048, lng: -99.11716 }); // Ubicación de centro línea 4
   const [userLocation, setUserLocation] = useState(null);
+  const [showPolyline, setShowPolyline] = useState(false); // Estado para controlar la visibilidad de la polilínea
 
 
   const handleZoomIn = () => {
@@ -24,6 +25,7 @@ const Home = () => {
 
 
   const handleLocateLine4 = () => {
+    setShowPolyline(prevState => !prevState);
     const line4Coords = { lat: 19.444048, lng: -99.11716 };
     setCenter(line4Coords);
     panToLocation(line4Coords.lat, line4Coords.lng);
@@ -47,7 +49,7 @@ const Home = () => {
         setMapZoom={setMapZoom}
         locateUser={locateUser}
         userLocation={userLocation}
-
+        showPolyline={showPolyline} // Pasa el estado de visibilidad como prop
       />
       <div className="controls-container">
         <button className="map-button" onClick={handleZoomIn}>Zoom In</button>
