@@ -55,7 +55,9 @@ const Home = () => {
         <button className="map-button" onClick={handleZoomIn}>Zoom In</button>
         <button className="map-button" onClick={handleZoomOut}>Zoom Out</button>
         <button className="map-button" onClick={handleLocateUser}>Ubicar Usuario</button>
-        <button className="map-button" onClick={handleLocateLine4}>Ubicar Línea 4</button>
+        <button className="map-button" onClick={handleLocateLine4}>{
+          showPolyline ? 'Ocultar Línea 4' : 'Mostrar Línea 4'}
+          </button>
       </div>
     </div>
   );
