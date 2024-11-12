@@ -7,6 +7,8 @@ const Home = () => {
   const { onMapLoad, panToLocation, setMapZoom, locateUser } = useMapNavigation();
   const [zoom, setZoom] = useState(13);
   const [center, setCenter] = useState({ lat: 19.444048, lng: -99.11716 }); // Ubicación de centro línea 4
+  const [userLocation, setUserLocation] = useState(null);
+
 
   const handleZoomIn = () => {
     const newZoom = zoom + 1;
@@ -27,6 +29,12 @@ const Home = () => {
     panToLocation(line4Coords.lat, line4Coords.lng);
   };
 
+  const handleLocateUser = () => {
+    locateUser((lat, lng) => {
+      setUserLocation({ lat, lng });
+    });
+  };
+
 
   return (
     <div>
@@ -38,11 +46,13 @@ const Home = () => {
         panToLocation={panToLocation}
         setMapZoom={setMapZoom}
         locateUser={locateUser}
+        userLocation={userLocation}
+
       />
       <div className="controls-container">
         <button className="map-button" onClick={handleZoomIn}>Zoom In</button>
         <button className="map-button" onClick={handleZoomOut}>Zoom Out</button>
-        <button className="map-button" onClick={locateUser}>Ubicar Usuario</button>
+        <button className="map-button" onClick={handleLocateUser}>Ubicar Usuario</button>
         <button className="map-button" onClick={handleLocateLine4}>Ubicar Línea 4</button>
       </div>
     </div>

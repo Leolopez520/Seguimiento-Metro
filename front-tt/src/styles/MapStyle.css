@@ -28,3 +28,13 @@
 .map-button:hover {
   background-color: #0056b3;
 }
+
+.user-location-circle {
+  width: 20px;
+  height: 20px;
+  background-color: #4285F4; /* Color azul */
+  border-radius: 50%;
+  border: 2px solid white; /* Borde blanco para que destaque */
+  box-shadow: 0 0 10px rgba(66, 133, 244, 0.6); /* Sombra suave para efecto */
+  transform: translate(-50%, -50%); /* Centrar el círculo en el punto */
+}
