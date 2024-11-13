@@ -121,8 +121,8 @@ class MainActivity : AppCompatActivity() {
         startService(intent)
 
         // Solicitar actualizaciones de ubicación de GPS y red
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0f, locationListener)
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0f, locationListener)
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0f, locationListener)
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0f, locationListener)
     }
 
     private fun enviarUbicacion(latitud: Double, longitud: Double) {
