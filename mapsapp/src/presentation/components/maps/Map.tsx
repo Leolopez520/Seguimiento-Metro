@@ -76,13 +76,13 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
   useEffect(() => {
     socket.on('nueva_ubicacion', (data) => {
       const newLocation = { latitude: data.punto.latitud, longitude: data.punto.longitud };
-      console.log('Nueva ubicación:', newLocation);
+      //console.log('Nueva ubicación:', newLocation);
       
       setRotation(calculateRotation(convoyPosition, newLocation));
       setConvoyPosition(newLocation);
 
       if (isFollowingConvoy) {
-        console.log("Moviendo la cámara a la nueva ubicación del convoy");
+        //console.log("Moviendo la cámara a la nueva ubicación del convoy");
         moveCameraToLocation(newLocation);
       }
     });
