@@ -1,15 +1,14 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import MapView, { Polyline, PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import { Image, Alert } from 'react-native';
-import { useEffect, useRef, useState } from 'react';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { Location } from '../../../infraestructure/interface/location';
 import { FAB } from '../ui/FAB';
 import { USER } from '../ui/USER';
 import { useLocationStore } from '../../store/location/useLocationStore';
-import { FIXED_ROUTE } from '../../navigation/fixedRoute';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { LINE_4_ROUTE } from '../../../infraestructure/interface/line4Route';
+import io from 'socket.io-client';
 
 interface Props {
   showUserLocation?: boolean;
@@ -34,16 +33,14 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
   const [isFollowingUser, setIsFollowingUser] = useState(true);
   const [isShowingPolyline, setIsShowingPolyline] = useState(true);
   const [isFollowingConvoy, setIsFollowingConvoy] = useState(false);
-  const [convoyPosition, setConvoyPosition] = useState<Location>(FIXED_ROUTE[0]);
-  const [routeIndex, setRouteIndex] = useState(0);
+  const [convoyPosition, setConvoyPosition] = useState<Location>(initialLocation);
   const [rotation, setRotation] = useState(0);
 
   const { getLocation, lastKnownLocation, watchLocation, clearWatchLocation } = useLocationStore();
-
+  const socket = useRef(io("http://20.163.180.10:5000")).current; // Cambia a la IP de tu servidor
 
   const fetchUserData = async () => {
     try {
-      // Obtén el ID del usuario desde AsyncStorage
       const userId = await AsyncStorage.getItem('userId');
       if (!userId) {
         Alert.alert("Error", "No se pudo obtener el ID del usuario");
@@ -64,8 +61,6 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
     }
   };
   
-  
-
   const moveCameraToLocation = (location: Location) => {
     if (!mapRef.current) return;
     mapRef.current.animateCamera({ center: location });
@@ -77,26 +72,25 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
     moveCameraToLocation(location);
   };
 
+  // Conectar al servidor y recibir la ubicación en tiempo real
   useEffect(() => {
-    const interval = setInterval(() => {
-      setRouteIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % FIXED_ROUTE.length;
-        const prevPosition = FIXED_ROUTE[prevIndex];
-        const nextPosition = FIXED_ROUTE[nextIndex];
-        setConvoyPosition(nextPosition);
-        const newRotation = calculateRotation(prevPosition, nextPosition);
-        setRotation(newRotation);
+    socket.on('nueva_ubicacion', (data) => {
+      const newLocation = { latitude: data.punto.latitud, longitude: data.punto.longitud };
+      console.log('Nueva ubicación:', newLocation);
+      
+      setRotation(calculateRotation(convoyPosition, newLocation));
+      setConvoyPosition(newLocation);
 
-        if (isFollowingConvoy) {
-          moveCameraToLocation(nextPosition);
-        }
+      if (isFollowingConvoy) {
+        moveCameraToLocation(newLocation);
+      }
+    });
 
-        return nextIndex;
-      });
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [isFollowingConvoy]);
+    return () => {
+      socket.off('nueva_ubicacion');
+      socket.disconnect();
+    };
+  }, [convoyPosition, isFollowingConvoy]);
 
   useEffect(() => {
     watchLocation();
@@ -129,15 +123,17 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
           longitudeDelta: 0.0121,
         }}
       >
+        {/* Dibuja la Línea 4 en el mapa */}
         {isShowingPolyline && (
           <Polyline 
-            coordinates={FIXED_ROUTE} 
-            strokeColor="black" 
+            coordinates={LINE_4_ROUTE} 
+            strokeColor="#62bbb1" 
             strokeWidth={5} 
           />
         )}
 
-        <Marker coordinate={convoyPosition} title="Convoy Simulado" anchor={{ x: 0.5, y: 0.5 }}>
+        {/* Marcador para el convoy en tiempo real */}
+        <Marker coordinate={convoyPosition} title="Ubicación del Convoy" anchor={{ x: 0.5, y: 0.5 }}>
           <Image
             source={require('../../../assets/images/metroimg.png')}
             style={{ 
@@ -198,7 +194,7 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
 
       <USER
         iconName="person-outline"
-        onPress={fetchUserData} // Cambia `moveToCurrentLocation` por `fetchUserData`
+        onPress={fetchUserData}
         style={{
           top: 10,
           left: 10,
