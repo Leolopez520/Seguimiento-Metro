@@ -37,7 +37,7 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
   const [rotation, setRotation] = useState(0);
 
   const { getLocation, lastKnownLocation, watchLocation, clearWatchLocation } = useLocationStore();
-  const socket = useRef(io("http://20.163.180.10:5000")).current; // Cambia a la IP de tu servidor
+  const socket = useRef(io("http://20.163.180.10:5000")).current;
 
   const fetchUserData = async () => {
     try {
@@ -82,6 +82,7 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
       setConvoyPosition(newLocation);
 
       if (isFollowingConvoy) {
+        console.log("Moviendo la cámara a la nueva ubicación del convoy");
         moveCameraToLocation(newLocation);
       }
     });
@@ -90,7 +91,7 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
       socket.off('nueva_ubicacion');
       socket.disconnect();
     };
-  }, [convoyPosition, isFollowingConvoy]);
+  }, [isFollowingConvoy]);
 
   useEffect(() => {
     watchLocation();
@@ -133,7 +134,12 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
         )}
 
         {/* Marcador para el convoy en tiempo real */}
-        <Marker coordinate={convoyPosition} title="Ubicación del Convoy" anchor={{ x: 0.5, y: 0.5 }}>
+        <Marker
+          key={`${convoyPosition.latitude}-${convoyPosition.longitude}`} // Para forzar el re-renderizado
+          coordinate={convoyPosition}
+          title="Ubicación del Convoy"
+          anchor={{ x: 0.5, y: 0.5 }}
+        >
           <Image
             source={require('../../../assets/images/metroimg.png')}
             style={{ 
