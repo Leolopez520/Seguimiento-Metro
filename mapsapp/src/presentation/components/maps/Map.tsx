@@ -33,8 +33,8 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
   const [isFollowingUser, setIsFollowingUser] = useState(true);
   const [isShowingPolyline, setIsShowingPolyline] = useState(true);
   const [isFollowingConvoy, setIsFollowingConvoy] = useState(false);
-  const [convoyPosition, setConvoyPosition] = useState<Location>(initialLocation);
-  const [rotation, setRotation] = useState(0);
+  const [trains, setTrains] = useState<{ [key: string]: { position: Location; rotation: number } }>({});
+  const [selectedConvoyId, setSelectedConvoyId] = useState<string | null>(null);
 
   const { getLocation, lastKnownLocation, watchLocation, clearWatchLocation } = useLocationStore();
   const socket = useRef(io("http://20.163.180.10:5000")).current;
@@ -46,10 +46,10 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
         Alert.alert("Error", "No se pudo obtener el ID del usuario");
         return;
       }
-  
+
       const response = await fetch(`http://20.163.180.10:5000/obtener_datos_usuario?user_id=${userId}`);
       const data = await response.json();
-  
+
       if (data.status === 'success') {
         navigation.navigate('UserProfileScreen', { usuario: data.usuario });
       } else {
@@ -60,7 +60,7 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
       Alert.alert("Error", "No se pudo obtener los datos del usuario");
     }
   };
-  
+
   const moveCameraToLocation = (location: Location) => {
     if (!mapRef.current) return;
     mapRef.current.animateCamera({ center: location });
@@ -75,23 +75,26 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
   // Conectar al servidor y recibir la ubicación en tiempo real
   useEffect(() => {
     socket.on('nueva_ubicacion', (data) => {
-      const newLocation = { latitude: data.punto.latitud, longitude: data.punto.longitud };
-      //console.log('Nueva ubicación:', newLocation);
-      
-      setRotation(calculateRotation(convoyPosition, newLocation));
-      setConvoyPosition(newLocation);
+      const { id_convoy, punto } = data;
+      const newLocation = { latitude: punto.latitud, longitude: punto.longitud };
 
-      if (isFollowingConvoy) {
-        //console.log("Moviendo la cámara a la nueva ubicación del convoy");
+      setTrains((prevTrains) => ({
+        ...prevTrains,
+        [id_convoy]: {
+          position: newLocation,
+          rotation: calculateRotation(prevTrains[id_convoy]?.position || newLocation, newLocation),
+        },
+      }));
+
+      if (isFollowingConvoy && selectedConvoyId === id_convoy) {
         moveCameraToLocation(newLocation);
       }
     });
 
     return () => {
       socket.off('nueva_ubicacion');
-      socket.disconnect();
     };
-  }, [isFollowingConvoy]);
+  }, [isFollowingConvoy, selectedConvoyId]);
 
   useEffect(() => {
     watchLocation();
@@ -133,23 +136,25 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
           />
         )}
 
-        {/* Marcador para el convoy en tiempo real */}
-        <Marker
-          key={`${convoyPosition.latitude}-${convoyPosition.longitude}`} // Para forzar el re-renderizado
-          coordinate={convoyPosition}
-          title="Ubicación del Convoy"
-          anchor={{ x: 0.5, y: 0.5 }}
-        >
-          <Image
-            source={require('../../../assets/images/metroimg.png')}
-            style={{ 
-              width: 80, 
-              height: 80, 
-              transform: [{ rotate: `${rotation}deg` }]
-            }}
-            resizeMode="contain"
-          />
-        </Marker> 
+        {/* Renderizar marcadores para cada tren */}
+        {Object.entries(trains).map(([id_convoy, { position, rotation }]) => (
+          <Marker
+            key={id_convoy}
+            coordinate={position}
+            title={`Convoy: ${id_convoy}`}
+            anchor={{ x: 0.5, y: 0.5 }}
+          >
+            <Image
+              source={require('../../../assets/images/metroimg.png')}
+              style={{
+                width: 80,
+                height: 80,
+                transform: [{ rotate: `${rotation}deg` }],
+              }}
+              resizeMode="contain"
+            />
+          </Marker>
+        ))}
       </MapView>
 
       <FAB
@@ -162,26 +167,10 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
       />
 
       <FAB
-        iconName={isFollowingUser ? 'walk-outline' : 'accessibility-outline'}
+        iconName="train-outline"
         onPress={() => {
-          setIsFollowingUser(!isFollowingUser);
-          if (!isFollowingUser) {
-            setIsFollowingConvoy(false);
-          }
-        }}
-        style={{
-          bottom: 140,
-          right: 20,
-        }}
-      />
-
-      <FAB
-        iconName={isFollowingConvoy ? 'train-outline' : 'skull-outline'}
-        onPress={() => {
-          setIsFollowingConvoy(!isFollowingConvoy);
-          if (!isFollowingConvoy) {
-            setIsFollowingUser(false);
-          }
+          setSelectedConvoyId('CONVOY_ID_A_SEGUIR'); // Cambia a un ID específico
+          setIsFollowingConvoy(true);
         }}
         style={{
           bottom: 80,
