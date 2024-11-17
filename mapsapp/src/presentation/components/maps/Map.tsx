@@ -8,6 +8,7 @@ import { USER } from '../ui/USER';
 import { useLocationStore } from '../../store/location/useLocationStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LINE_4_ROUTE } from '../../../infraestructure/interface/line4Route';
+import { STATIONS } from '../../../infraestructure/interface/stations';
 import io from 'socket.io-client';
 
 interface Props {
@@ -155,6 +156,25 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
             />
           </Marker>
         ))}
+        
+        {/* Renderizar marcadores para cada estación */}
+        {STATIONS.map((station) => (
+          <Marker
+            key={station.id.toString()}
+            coordinate={station.location}
+            title={`Estación: ${station.name}`}
+            description="Línea 4"
+          >
+            <Image
+              source={require('../../../assets/images/pin.png')}
+              style={{
+                width: 20,
+                height: 20,
+              }}
+              resizeMode="contain"
+            />
+          </Marker>
+        ))}
       </MapView>
 
       <FAB
@@ -174,6 +194,20 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
         }}
         style={{
           bottom: 80,
+          right: 20,
+        }}
+      />
+
+      <FAB
+        iconName={isFollowingUser ? 'walk-outline' : 'accessibility-outline'}
+        onPress={() => {
+          setIsFollowingUser(!isFollowingUser);
+          if (!isFollowingUser) {
+            setIsFollowingConvoy(false);
+          }
+        }}
+        style={{
+          bottom: 140,
           right: 20,
         }}
       />
