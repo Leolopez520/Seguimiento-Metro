@@ -8,7 +8,6 @@ import { USER } from '../ui/USER';
 import { useLocationStore } from '../../store/location/useLocationStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LINE_4_ROUTE } from '../../../infraestructure/interface/line4Route';
-import { STATIONS } from '../../../infraestructure/interface/stations';
 import io from 'socket.io-client';
 
 interface Props {
@@ -27,6 +26,21 @@ type RootStackParamList = {
   // Add other routes here if needed
 };
 
+// Fórmula Haversine para calcular la distancia entre dos puntos geográficos
+const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const toRad = (value: number) => (value * Math.PI) / 180;
+  const R = 6371; // Radio de la Tierra en km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distancia en km
+};
+
+
+
 export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const mapRef = useRef<MapView>();
@@ -34,8 +48,10 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
   const [isFollowingUser, setIsFollowingUser] = useState(true);
   const [isShowingPolyline, setIsShowingPolyline] = useState(true);
   const [isFollowingConvoy, setIsFollowingConvoy] = useState(false);
-  const [trains, setTrains] = useState<{ [key: string]: { position: Location; rotation: number } }>({});
+  const [trains, setTrains] = useState<{ [key: string]: { position: Location; rotation: number; direction: string } }>({});
   const [selectedConvoyId, setSelectedConvoyId] = useState<string | null>(null);
+  const [stations, setStations] = useState<{ id: number; name: string; location: { latitude: number; longitude: number } }[]>([]);
+  const [convoyDirections, setConvoyDirections] = useState<{ [key: string]: string }>({});
 
   const { getLocation, lastKnownLocation, watchLocation, clearWatchLocation } = useLocationStore();
   const socket = useRef(io("http://20.163.180.10:5000")).current;
@@ -73,19 +89,86 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
     moveCameraToLocation(location);
   };
 
+  const fetchStations = async () => {
+    try {
+        const response = await fetch('http://20.163.180.10:5000/estaciones');
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            setStations(data.estaciones);
+        } else {
+            console.error('Error al obtener estaciones:', data.message);
+        }
+    } catch (error) {
+        console.error('Error al hacer la solicitud de estaciones:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStations();
+  }, []);
+
   // Conectar al servidor y recibir la ubicación en tiempo real
   useEffect(() => {
     socket.on('nueva_ubicacion', (data) => {
       const { id_convoy, punto } = data;
       const newLocation = { latitude: punto.latitud, longitude: punto.longitud };
 
-      setTrains((prevTrains) => ({
-        ...prevTrains,
-        [id_convoy]: {
-          position: newLocation,
-          rotation: calculateRotation(prevTrains[id_convoy]?.position || newLocation, newLocation),
-        },
-      }));
+      setTrains((prevTrains) => {
+        const prevTrain = prevTrains[id_convoy];
+        const prevLocation = prevTrain?.position || newLocation;
+
+        // Estaciones terminales
+        const martinCarrera = { latitude: 19.485752693339933, longitude: -99.10447595414047 };
+        const santaAnita = { latitude: 19.402838781570377, longitude: -99.1216871104352 };
+
+        // Calcular distancias usando la fórmula de Haversine
+        const distanceToMartinCarreraPrev = haversineDistance(
+          prevLocation.latitude,
+          prevLocation.longitude,
+          martinCarrera.latitude,
+          martinCarrera.longitude
+        );
+        const distanceToMartinCarreraNew = haversineDistance(
+          newLocation.latitude,
+          newLocation.longitude,
+          martinCarrera.latitude,
+          martinCarrera.longitude
+        );
+
+        const distanceToSantaAnitaPrev = haversineDistance(
+          prevLocation.latitude,
+          prevLocation.longitude,
+          santaAnita.latitude,
+          santaAnita.longitude
+        );
+        const distanceToSantaAnitaNew = haversineDistance(
+          newLocation.latitude,
+          newLocation.longitude,
+          santaAnita.latitude,
+          santaAnita.longitude
+        );
+
+        // Determinar dirección
+        const direction =
+          distanceToMartinCarreraNew < distanceToMartinCarreraPrev
+            ? 'Martin Carrera'
+            : 'Santa Anita';
+
+        // Actualizar estado de la dirección
+        setConvoyDirections((prevDirections) => ({
+          ...prevDirections,
+          [id_convoy]: direction,
+        }));
+
+        return {
+          ...prevTrains,
+          [id_convoy]: {
+            position: newLocation,
+            rotation: calculateRotation(prevLocation, newLocation),
+          },
+        };
+      });
 
       if (isFollowingConvoy && selectedConvoyId === id_convoy) {
         moveCameraToLocation(newLocation);
@@ -96,6 +179,9 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
       socket.off('nueva_ubicacion');
     };
   }, [isFollowingConvoy, selectedConvoyId]);
+
+
+
 
   useEffect(() => {
     watchLocation();
@@ -143,6 +229,7 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
             key={id_convoy}
             coordinate={position}
             title={`Convoy: ${id_convoy}`}
+            description={`Dirección: ${convoyDirections[id_convoy] || 'Calculando...'}`}
             anchor={{ x: 0.5, y: 0.5 }}
           >
             <Image
@@ -156,14 +243,13 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
             />
           </Marker>
         ))}
-        
-        {/* Renderizar marcadores para cada estación */}
-        {STATIONS.map((station) => (
+
+        {stations.map((station) => (
           <Marker
             key={station.id.toString()}
             coordinate={station.location}
             title={`Estación: ${station.name}`}
-            description="Línea 4"
+            description={`Línea 4`}
           >
             <Image
               source={require('../../../assets/images/pin.png')}
