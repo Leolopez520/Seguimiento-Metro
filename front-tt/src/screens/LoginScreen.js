@@ -12,9 +12,7 @@ const LoginScreen = () => {
       <div className="links-container">
         <Link to="/forgotpassword" className="forgotpassword-link">¿Olvidaste tu contraseña?</Link>
         <Link to="/signup" className="login-link">Registrarse</Link>
-        <Link to="/manageconvoy" className="manage-link">Gestionar Convoy</Link>
         <a href="/home" className="link">Ver Mapa</a>
-        <a href="/admin-map" className="link">Ver Mapa Superusuario</a>
       </div>
     </div>
   );

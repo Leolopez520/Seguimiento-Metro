@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import MapComponent from '../components/MapComponent';
 import useMapNavigation from '../hooks/UseMapNavigation';
 import '../styles/MapStyle.css';
+import Header from '../components/Header'; 
 
 const Home = () => {
   const { onMapLoad, panToLocation, setMapZoom, locateUser } = useMapNavigation();
@@ -37,10 +38,32 @@ const Home = () => {
     });
   };
 
+  // Información del usuario (puedes obtener esto de un hook o servicio)
+  const userPhoto = 'https://via.placeholder.com/40'; // Reemplaza con la URL real
+  const isSuperUser = true; // Cambia según el estado real del usuario
+
+  const handleLogout = () => {
+    console.log('Sesión cerrada'); // Agregar lógica para cerrar sesión
+  };
+
+  const handleViewUserInfo = () => {
+    console.log('Ver información del usuario'); // Agregar lógica para mostrar la información
+  };
+
+  const handleManageConvoys = () => {
+    console.log('Gestionar convoys'); // Agregar lógica para gestionar convoys
+  };
 
   return (
     <div>
-      <h1>Ubica Mi Metro</h1>
+      <Header
+        userPhoto={userPhoto}
+        isSuperUser={isSuperUser}
+        onLogout={handleLogout}
+        onViewUserInfo={handleViewUserInfo}
+        onManageConvoys={handleManageConvoys}
+      />
+
       <MapComponent 
         center={center} 
         zoom={zoom} 
