@@ -231,6 +231,7 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
             title={`Convoy: ${id_convoy}`}
             description={`Dirección: ${convoyDirections[id_convoy] || 'Calculando...'}`}
             anchor={{ x: 0.5, y: 0.5 }}
+            flat={true} // Asegura que el marcador no rote con el mapa
           >
             <Image
               source={require('../../../assets/images/metroimg.png')}
