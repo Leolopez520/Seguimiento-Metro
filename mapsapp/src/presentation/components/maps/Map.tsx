@@ -26,21 +26,6 @@ type RootStackParamList = {
   // Add other routes here if needed
 };
 
-// Fórmula Haversine para calcular la distancia entre dos puntos geográficos
-const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-  const toRad = (value: number) => (value * Math.PI) / 180;
-  const R = 6371; // Radio de la Tierra en km
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // Distancia en km
-};
-
-
-
 export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const mapRef = useRef<MapView>();
@@ -51,8 +36,6 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
   const [trains, setTrains] = useState<{ [key: string]: { position: Location; rotation: number; direction: string } }>({});
   const [selectedConvoyId, setSelectedConvoyId] = useState<string | null>(null);
   const [stations, setStations] = useState<{ id: number; name: string; location: { latitude: number; longitude: number } }[]>([]);
-  const [convoyDirections, setConvoyDirections] = useState<{ [key: string]: string }>({});
-
   const { getLocation, lastKnownLocation, watchLocation, clearWatchLocation } = useLocationStore();
   const socket = useRef(io("http://20.163.180.10:5000")).current;
 
@@ -114,61 +97,13 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
       const { id_convoy, punto } = data;
       const newLocation = { latitude: punto.latitud, longitude: punto.longitud };
 
-      setTrains((prevTrains) => {
-        const prevTrain = prevTrains[id_convoy];
-        const prevLocation = prevTrain?.position || newLocation;
-
-        // Estaciones terminales
-        const martinCarrera = { latitude: 19.485752693339933, longitude: -99.10447595414047 };
-        const santaAnita = { latitude: 19.402838781570377, longitude: -99.1216871104352 };
-
-        // Calcular distancias usando la fórmula de Haversine
-        const distanceToMartinCarreraPrev = haversineDistance(
-          prevLocation.latitude,
-          prevLocation.longitude,
-          martinCarrera.latitude,
-          martinCarrera.longitude
-        );
-        const distanceToMartinCarreraNew = haversineDistance(
-          newLocation.latitude,
-          newLocation.longitude,
-          martinCarrera.latitude,
-          martinCarrera.longitude
-        );
-
-        const distanceToSantaAnitaPrev = haversineDistance(
-          prevLocation.latitude,
-          prevLocation.longitude,
-          santaAnita.latitude,
-          santaAnita.longitude
-        );
-        const distanceToSantaAnitaNew = haversineDistance(
-          newLocation.latitude,
-          newLocation.longitude,
-          santaAnita.latitude,
-          santaAnita.longitude
-        );
-
-        // Determinar dirección
-        const direction =
-          distanceToMartinCarreraNew < distanceToMartinCarreraPrev
-            ? 'Martin Carrera'
-            : 'Santa Anita';
-
-        // Actualizar estado de la dirección
-        setConvoyDirections((prevDirections) => ({
-          ...prevDirections,
-          [id_convoy]: direction,
-        }));
-
-        return {
-          ...prevTrains,
-          [id_convoy]: {
-            position: newLocation,
-            rotation: calculateRotation(prevLocation, newLocation),
-          },
-        };
-      });
+      setTrains((prevTrains) => ({
+        ...prevTrains,
+        [id_convoy]: {
+          position: newLocation,
+          rotation: calculateRotation(prevTrains[id_convoy]?.position || newLocation, newLocation),
+        },
+      }));
 
       if (isFollowingConvoy && selectedConvoyId === id_convoy) {
         moveCameraToLocation(newLocation);
@@ -179,9 +114,6 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
       socket.off('nueva_ubicacion');
     };
   }, [isFollowingConvoy, selectedConvoyId]);
-
-
-
 
   useEffect(() => {
     watchLocation();
@@ -224,12 +156,12 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
         )}
 
         {/* Renderizar marcadores para cada tren */}
+        {/*Hola */}
         {Object.entries(trains).map(([id_convoy, { position, rotation }]) => (
           <Marker
             key={id_convoy}
             coordinate={position}
             title={`Convoy: ${id_convoy}`}
-            description={`Dirección: ${convoyDirections[id_convoy] || 'Calculando...'}`}
             anchor={{ x: 0.5, y: 0.5 }}
             flat={true} // Asegura que el marcador no rote con el mapa
           >
