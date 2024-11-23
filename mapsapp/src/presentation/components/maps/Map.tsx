@@ -38,6 +38,8 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
   const [stations, setStations] = useState<{ id: number; name: string; location: { latitude: number; longitude: number } }[]>([]);
   const { getLocation, lastKnownLocation, watchLocation, clearWatchLocation } = useLocationStore();
   const socket = useRef(io("http://20.163.180.10:5000")).current;
+  const [estimaciones, setEstimaciones] = useState<{ [key: string]: number | null }>({});
+
 
   const fetchUserData = async () => {
     try {
@@ -91,12 +93,12 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
     fetchStations();
   }, []);
 
-  // Conectar al servidor y recibir la ubicación en tiempo real
   useEffect(() => {
-    socket.on('nueva_ubicacion', (data) => {
+    socket.on('nueva_ubicacion', async (data) => {
       const { id_convoy, punto } = data;
       const newLocation = { latitude: punto.latitud, longitude: punto.longitud };
-
+  
+      // Actualizar la posición del convoy
       setTrains((prevTrains) => ({
         ...prevTrains,
         [id_convoy]: {
@@ -104,16 +106,33 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
           rotation: calculateRotation(prevTrains[id_convoy]?.position || newLocation, newLocation),
         },
       }));
-
+  
+      // Obtener el tiempo estimado del convoy
+      try {
+        const response = await fetch(`http://20.163.180.10:5000/estimacion/${id_convoy}`);
+        const data = await response.json();
+  
+        if (data.status === 'success' && data.estimacion) {
+          setEstimaciones((prevEstimaciones) => ({
+            ...prevEstimaciones,
+            [id_convoy]: data.estimacion.tiempo_estimado,
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching estimation:', error);
+      }
+  
+      // Seguir al convoy seleccionado si está activado
       if (isFollowingConvoy && selectedConvoyId === id_convoy) {
         moveCameraToLocation(newLocation);
       }
     });
-
+  
     return () => {
       socket.off('nueva_ubicacion');
     };
   }, [isFollowingConvoy, selectedConvoyId]);
+    
 
   useEffect(() => {
     watchLocation();
@@ -156,12 +175,12 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
         )}
 
         {/* Renderizar marcadores para cada tren */}
-        {/*Hola */}
         {Object.entries(trains).map(([id_convoy, { position, rotation }]) => (
           <Marker
             key={id_convoy}
             coordinate={position}
             title={`Convoy: ${id_convoy}`}
+            description={`Tiempo estimado: ${estimaciones[id_convoy] ? estimaciones[id_convoy].toFixed(2) + 's' : 'Desconocido'}`}
             anchor={{ x: 0.5, y: 0.5 }}
             flat={true} // Asegura que el marcador no rote con el mapa
           >
