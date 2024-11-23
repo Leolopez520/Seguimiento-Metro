@@ -156,6 +156,7 @@ export const Map = ({ showUserLocation = true, initialLocation }: Props) => {
         )}
 
         {/* Renderizar marcadores para cada tren */}
+        {/*Hola */}
         {Object.entries(trains).map(([id_convoy, { position, rotation }]) => (
           <Marker
             key={id_convoy}
