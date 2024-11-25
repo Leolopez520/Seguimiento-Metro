@@ -19,9 +19,9 @@ const calculateRotation = (prevPos: Location, currPos: Location) => {
   const dx = currPos.longitude - prevPos.longitude;
   const dy = currPos.latitude - prevPos.latitude;
 
-  // Calcular el ángulo correcto con atan2 y ajustar según el sistema de coordenadas geográficas
-  //const angle = Math.atan2(dy, dx); // Resultado en radianes
-  //return (angle * 180) / Math.PI;
+  //Calcular el ángulo correcto con atan2 y ajustar según el sistema de coordenadas geográficas
+  const angle = Math.atan2(dy, dx); // Resultado en radianes
+  return (angle * 180) / Math.PI;
 
 
   
